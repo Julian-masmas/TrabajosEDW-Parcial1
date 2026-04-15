@@ -1,10 +1,20 @@
 package com.example.examen1_2.dto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class EmpleadoRequest {
 
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+    @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "El correo debe tener formato válido")
     private String correo;
+    @NotNull(message = "El salario es obligatorio")
+    @Positive(message = "El salario debe ser mayor que 0")
     private Double salario;
 
     public EmpleadoRequest() {

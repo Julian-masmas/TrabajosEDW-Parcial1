@@ -8,6 +8,7 @@ import com.example.examen1_2.service.EmpleadoService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmpleadoServiceImpl implements EmpleadoService {
@@ -19,32 +20,39 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     }
 
     @Override
-    public EmpleadoResponse crearEmpleado(EmpleadoRequest empleadoRequest) {
+    public EmpleadoResponse crearEmpleado(EmpleadoRequest request) {
+
+        // 🔴 MAPEO CORRECTO DTO → ENTITY
         Empleado empleado = new Empleado();
-        empleado.setNombre(empleadoRequest.getNombre());
-        empleado.setApellido(empleadoRequest.getApellido());
-        empleado.setCorreo(empleadoRequest.getCorreo());
-        empleado.setSalario(empleadoRequest.getSalario());
+        empleado.setNombre(request.getNombre());
+        empleado.setApellido(request.getApellido());
+        empleado.setCorreo(request.getCorreo());
+        empleado.setSalario(request.getSalario());
 
-        Empleado empleadoGuardado = empleadoRepository.save(empleado);
+        // guardar en BD
+        Empleado guardado = empleadoRepository.save(empleado);
 
-        return mapToResponse(empleadoGuardado);
+        // ENTITY → RESPONSE
+        return new EmpleadoResponse(
+                guardado.getId(),
+                guardado.getNombre(),
+                guardado.getApellido(),
+                guardado.getCorreo(),
+                guardado.getSalario()
+        );
     }
 
     @Override
     public List<EmpleadoResponse> listarEmpleados() {
         return empleadoRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    private EmpleadoResponse mapToResponse(Empleado empleado) {
-        return new EmpleadoResponse(
-                empleado.getId(),
-                empleado.getNombre(),
-                empleado.getApellido(),
-                empleado.getCorreo(),
-                empleado.getSalario());
+                .map(e -> new EmpleadoResponse(
+                        e.getId(),
+                        e.getNombre(),
+                        e.getApellido(),
+                        e.getCorreo(),
+                        e.getSalario()
+                ))
+                .collect(Collectors.toList());
     }
 }
